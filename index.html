@@ -239,7 +239,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = 'clinical_ultrasound_logbook_sinnar_v2';
+  const STORAGE_KEY = 'clinical_ultrasound_logbook_sinnar_v3';
 
   function init() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -346,10 +346,36 @@
       const tr = tbody.insertRow();
       row.forEach((val, j) => {
         const td = tr.insertCell();
+
+        // First column (# index) for attendance and cases
         if(j === 0 && (sel === '#attendance-table' || sel === '#cases-table')) {
           td.textContent = (i+1);
-        } else {
-          if(sel === '#cases-table' && (j === 2 || j === 3)) {
+          return;
+        }
+
+        // Attendance table: Date, Time, Time, Text, Text
+        if(sel === '#attendance-table') {
+          const inp = document.createElement('input');
+          if(j === 1) {
+            inp.type = 'date';
+          } else if(j === 2 || j === 3) {
+            inp.type = 'time';
+          } else {
+            inp.type = 'text';
+          }
+          inp.value = val || '';
+          td.appendChild(inp);
+          return;
+        }
+
+        // Cases table: Date, Select, Select, Text, Text
+        if(sel === '#cases-table') {
+          if(j === 1) {
+            const inp = document.createElement('input');
+            inp.type = 'date';
+            inp.value = val || '';
+            td.appendChild(inp);
+          } else if(j === 2 || j === 3) {
             const selEl = document.createElement('select');
             if(j === 2) {
               selEl.innerHTML = '<option value="">Select</option><option>Abdominal</option><option>Gynecologic</option><option>Obstetric</option><option>Other</option>';
@@ -364,7 +390,14 @@
             inp.value = val || '';
             td.appendChild(inp);
           }
+          return;
         }
+
+        // Mid and Final tables: simple text inputs
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = val || '';
+        td.appendChild(inp);
       });
     });
   }
